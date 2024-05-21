@@ -1,7 +1,7 @@
 import React from "react";
 import "./Notifications.css";
 import closeIcon from "./close-icon.png";
-import { getLatestNotification } from "./0x01-react_intro/task_3/dashboard/src/utils";
+import { getLatestNotification } from "../0x01-react_intro/task_3/dashboard/src/utils";
 
 function Notifications(){
     return (
