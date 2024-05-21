@@ -15,7 +15,7 @@ function App() {
       </div>
 
       <div className="App-footer">
-        <p> {getFullYear()} - {getFooterCopy()}</p>
+      <p>Copyright 2020 - holberton School</p>
       </div>
     </div>
     </>
