@@ -1,88 +1,113 @@
 /**
  * @jest-environment jsdom
  */
-import React from "react";
-import App from "./App";
-import Login from "../Login/Login";
-import Header from "../Header/Header";
-import Footer from "../Footer/Footer";
-import Notifications from "../Notifications/Notifications";
-import CourseList from "../CourseList/CourseList";
-import { shallow, mount } from "enzyme";
 
-describe("App tests", () => {
-  it("renders without crashing", () => {
-    const component = shallow(<App />);
+import { mount, shallow } from 'enzyme';
+import App from './App';
+import Header from '../Header/Header';
+import Footer from '../Footer/Footer';
+import Login from '../Login/Login';
+import Notifications from '../Notifications/Notifications';
+import CourseList from '../CourseList/CourseList';
+import React from 'react';
+import { getLatestNotification } from '../utils/utils';
+import { StyleSheetTestUtils } from 'aphrodite';
 
-    expect(component).toBeDefined();
+beforeEach(() => {
+  StyleSheetTestUtils.suppressStyleInjection();
+});
+
+afterEach(() => {
+  StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+});
+
+const listNotifications = [
+  { id: 1, type: 'default', value: 'New course available' },
+  { id: 2, type: 'urgent', value: 'New resume available' },
+  { id: 3, type: 'urgent', html: getLatestNotification() },
+];
+
+const listCourses = [
+  { id: 1, name: 'ES6', credit: 60 },
+  { id: 2, name: 'Webpack', credit: 20 },
+  { id: 3, name: 'React', credit: 40 },
+];
+
+describe('App Componenet', function () {
+  it('Without Crashing', function () {
+    const app = shallow(<App />);
+    expect(app.exists()).toBe(true);
   });
-  it("should render Notifications component", () => {
-    const component = shallow(<App />);
 
-    expect(component.containsMatchingElement(<Notifications />)).toEqual(false);
+  it('Render Notifications Component', () => {
+    const app = shallow(<App />);
+    expect(
+      app.contains(<Notifications listNotifications={listNotifications} />)
+    ).toBe(true);
   });
-  it("should render Header component", () => {
-    const component = shallow(<App />);
 
-    expect(component.contains(<Header />)).toBe(true);
+  it('Render Header Component', () => {
+    const app = shallow(<App />);
+    expect(app.contains(<Header />)).toBe(true);
   });
-  it("should render Login Component", () => {
-    const component = shallow(<App />);
 
-    expect(component.contains(<Login />)).toBe(true);
+  it('Render Login Component', () => {
+    const app = shallow(<App />);
+    expect(app.contains(<Login />)).toBe(true);
   });
-  it("should render Footer Component", () => {
-    const component = shallow(<App />);
 
-    expect(component.contains(<Footer />)).toBe(true);
+  it('Render Footer Component', () => {
+    const app = shallow(<App />);
+    expect(app.contains(<Footer />)).toBe(true);
   });
-  it("does not render courselist if logged out", () => {
-    const component = shallow(<App />);
 
-    component.setProps({ isLogedIn: false });
-
-    expect(component.contains(<CourseList />)).toBe(false);
-  });
-  it("renders courselist if logged in", () => {
-    const component = shallow(<App isLoggedIn={true} />);
-
-    expect(component.containsMatchingElement(<CourseList />)).toEqual(false);
-    expect(component.contains(<Login />)).toBe(false);
+  it('Render CourseList Component', () => {
+    const app = shallow(<App isLoggedIn={true} />);
+    expect(app.contains(<CourseList listCourses={listCourses} />)).toBe(true);
   });
 });
 
-describe("When ctrl + h is pressed", () => {
-  it("calls logOut function", () => {
-    const mocked = jest.fn();
-    const wrapper = mount(<App logOut={mocked} />);
-    const event = new KeyboardEvent("keydown", { ctrlKey: true, key: "h" });
-    document.dispatchEvent(event);
-
-    expect(mocked).toHaveBeenCalledTimes(1);
-    wrapper.unmount();
+describe('App Body checks', () => {
+  it('check if login exists', () => {
+    const app = shallow(<App isLoggedIn={true} />);
+    expect(app.contains(<Login />)).toBe(false);
   });
 
-  document.alert = jest.fn();
-  it("checks that alert function is called", () => {
-    const wrapper = mount(<App />);
-    const spy = jest.spyOn(window, "alert");
-    const event = new KeyboardEvent("keydown", { ctrlKey: true, key: "h" });
-    document.dispatchEvent(event);
+  it('check if course list exists', () => {
+    const app = shallow(<App isLoggedIn={true} />);
+    expect(app.contains(<CourseList listCourses={listCourses} />)).toBe(true);
+  });
+});
 
+describe('Ctrl + h', () => {
+  it('LogOut is called', () => {
+    const mockedFn = jest.fn();
+    const app = mount(<App logOut={mockedFn} />);
+    const event = new KeyboardEvent('keydown', { ctrlKey: true, key: 'h' });
+    document.dispatchEvent(event);
+    expect(mockedFn).toHaveBeenCalledTimes(1);
+    app.unmount();
+  });
+
+  window.alert = jest.fn();
+  it('Alert is called', () => {
+    const app = mount(<App />);
+    const spy = jest.spyOn(window, 'alert');
+    const event = new KeyboardEvent('keydown', { ctrlKey: true, key: 'h' });
+    document.dispatchEvent(event);
     expect(spy).toHaveBeenCalled();
     spy.mockRestore();
-    wrapper.unmount();
+    app.unmount();
   });
 
-  it('checks that the alert is "Logging you out"', () => {
-    const wrapper = mount(<App />);
-    const spy = jest.spyOn(window, "alert");
-    const event = new KeyboardEvent("keydown", { ctrlKey: true, key: "h" });
+  it('Alert message', () => {
+    const app = mount(<App />);
+    const spy = jest.spyOn(window, 'alert');
+    const event = new KeyboardEvent('keydown', { ctrlKey: true, key: 'h' });
     document.dispatchEvent(event);
-
-    expect(spy).toHaveBeenCalledWith("Logging you out");
+    expect(spy).toHaveBeenCalledWith('Logging you out');
     jest.restoreAllMocks();
-    wrapper.unmount();
+    app.unmount();
   });
-  document.alert.mockClear();
+  window.alert.mockClear();
 });
