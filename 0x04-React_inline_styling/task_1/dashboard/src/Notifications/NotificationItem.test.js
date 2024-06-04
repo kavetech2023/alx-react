@@ -1,36 +1,44 @@
-import React from 'react';
-import NotificationItem from './NotificationItem';
-import { shallow } from 'enzyme';
+import React from "react";
+import NotificationItem from "./NotificationItem";
+import { shallow } from "enzyme";
+import { StyleSheetTestUtils } from "aphrodite";
 
-describe('Notification Component', () => {
-  it('Without Crashing', () => {
-    const ntfItem = shallow(
-      <NotificationItem type="default" value="just for testing" />
-    );
-    expect(ntfItem.exists()).toBe(true);
+beforeEach(() => {
+  StyleSheetTestUtils.suppressStyleInjection();
+});
+afterEach(() => {
+  StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
+});
+
+describe("rendering components", () => {
+  it("renders NotificationItem component without crashing", () => {
+    const wrapper = shallow(<NotificationItem />);
+
+    expect(wrapper.exists()).toBe(true);
   });
 
-  it('Default item', () => {
-    const ntfItem = shallow(<NotificationItem type="default" value="test" />);
-    expect(ntfItem.html()).toBe(
-      '<li data-notification-type="default">test</li>'
-    );
+  it('renders correct html from type="default" value="test" props', () => {
+    const wrapper = shallow(<NotificationItem />);
+
+    wrapper.setProps({ type: "default", value: "test" });
+    expect(wrapper.html()).toEqual('<li data-notification-type="default">test</li>');
   });
 
-  it('Render "<u>test</u>"', () => {
-    const ntfItem = shallow(<NotificationItem html="<u>test</u>" />);
-    expect(ntfItem.html()).toBe(
-      '<li data-notification-type="urgent"><u>test</u></li>'
-    );
+  it('renders correct html from  html="<u>test</u>" props', () => {
+    const wrapper = shallow(<NotificationItem />);
+
+    wrapper.setProps({ html: "<u>test</u>" });
+    expect(wrapper.html()).toEqual('<li data-urgent="true"><u>test</u></li>');
   });
 });
 
-describe('Click event behaver', () => {
-  it('Calling the Console', () => {
-    const ntfitem = shallow(<NotificationItem />);
+describe("onclick event behaves as it should", () => {
+  it("should call console.log", () => {
+    const wrapper = shallow(<NotificationItem />);
     const spy = jest.fn();
-    ntfitem.setProps({ value: 'item', markAsRead: spy, id: 1 });
-    ntfitem.find('li').props().onClick();
+
+    wrapper.setProps({ value: "test item", markAsRead: spy, id: 1 });
+    wrapper.find("li").props().onClick();
     expect(spy).toBeCalledTimes(1);
     expect(spy).toBeCalledWith(1);
     spy.mockRestore();

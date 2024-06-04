@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+import React, { Component } from "react";
 
-export default class BodySection extends React.Component {
+class BodySection extends Component {
   render() {
     return (
       <div className="bodySection">
@@ -16,3 +16,5 @@ BodySection.propTypes = {
   title: PropTypes.string.isRequired,
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
 };
+
+export default BodySection;
